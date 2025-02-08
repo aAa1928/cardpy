@@ -1,2 +1,2 @@
 def hello():
-    print("Hello, from pycard.main!")
+    print("Hello, from cardpy.main!")
