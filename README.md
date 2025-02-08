@@ -1,2 +1,3 @@
-# pycard
-A Python module for playing cards
+# cardpy
+
+A Python module for playing cards.
