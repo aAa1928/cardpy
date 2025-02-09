@@ -27,7 +27,7 @@ class Card:
         self.suit = _suit
 
     def __str__(self):
-        return f'{self.rank.value}{self.suit.value}'
+        return f'{self.rank.name} of {self.suit.name} {self.suit.value}'
 
     def __repr__(self):
         return f'Card({self.rank=}, {self.suit=})'
@@ -35,3 +35,4 @@ class Card:
 if __name__ == '__main__':
     card = Card(Rank.ACE, Suit.SPADES)
     print(card)
+    print(repr(card))
