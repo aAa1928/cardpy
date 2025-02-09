@@ -349,6 +349,16 @@ class Deck:
             self.cards = [deepcopy(card) for card in self.cards for _ in range(other)]
         return self
 
+    def __lt__(self, other: 'Card') -> bool:
+        if not isinstance(other, Card):
+            return NotImplemented
+        return Card.ranks.index(self.rank) < Card.ranks.index(other.rank)
+    
+    def __gt__(self, other: 'Card') -> bool:
+        if not isinstance(other, Card):
+            return NotImplemented
+        return Card.ranks.index(self.rank) > Card.ranks.index(other.rank)
+
     def __repr__(self):
         return f'Deck({self.cards=})'
  
