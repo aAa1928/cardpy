@@ -1,21 +1,13 @@
+from copy import deepcopy
 from enum import Enum
 from random import shuffle
 from typing import Iterable, Iterator, Optional, Self
 
-class Suit(Enum):
-    '''
-    Suits of playing cards.
-    '''
-    HEARTS = '♥'
-    DIAMONDS = '♦'
-    CLUBS = '♣'
-    SPADES = '♠'
-
-
 class Rank(Enum):
-    '''
-    Ranks of playing cards.
-    '''
+    """
+    Ranks of playing cards in ascending order from TWO to ACE.
+    Values are the string representations used for display.
+    """
     TWO = '2'
     THREE = '3'
     FOUR = '4'
@@ -31,6 +23,17 @@ class Rank(Enum):
     ACE = 'A'
     
     # JOKER = NotImplemented # TODO
+
+
+class Suit(Enum):
+    """
+    Suits of playing cards with Unicode symbols as values.
+    Standard order: SPADES (♠), HEARTS (♥), DIAMONDS (♦), CLUBS (♣)
+    """
+    HEARTS = '♥'
+    DIAMONDS = '♦'
+    CLUBS = '♣'
+    SPADES = '♠'
 
 
 class Color(Enum):
@@ -95,13 +98,15 @@ class Card:
 
 class Deck:
 
-    def __init__(self, cards: Iterable[Card] = None, *, init: bool = False):
+    def __init__(self, cards: Iterable[Card] = None, *, init: bool = False, deck_count: Optional[int] = 1):
         """Initialize a deck
         
         Args:
-            init: (bool) If True, create a standard 52-card deck, else initialize an empty deck.
             cards: (Card) Additional cards in an iterable, such as a list, to initialize the deck with. \
                 If init is True, these cards are added on top of the standard deck.
+            init: (bool) If True, create a standard 52-card deck, else initialize an empty deck.
+            deck_count: (int) Number of decks to create (duplicates cards). Defaults to 1. deck_count = 2 is \
+                is equivalent to creating a standard 52-card deck and adding another standard 52-card deck on top of it.
         """
         self.cards = [Card(rank, suit, self) for rank in Rank for suit in Suit] if init else []
         if not all (isinstance(card, (Card, Deck)) for card in cards):
@@ -112,6 +117,17 @@ class Deck:
         else:
             self.cards.extend(cards) if cards else None
 
+        match deck_count:
+            case 0:
+                self.clear()
+            case 1:
+                pass
+            case _:
+                if isinstance(deck_count, int) and deck_count > 1:
+                    self.cards = [deepcopy(card) for card in self.cards for _ in range(deck_count)]
+                else:
+                    raise TypeError("deck_count must be an integer greater than 1")
+
     def append(self, card: Card) -> Self:
         """Add a card to the deck"""
         if not isinstance(card, Card):
@@ -120,12 +136,24 @@ class Deck:
 
         return self
 
-    def clear(self, *, init = False) -> Self:
+    def clear(self, *, init = False, deck_count = 1) -> Self:
         '''
         Clears deck. If init is True, creates a standard 52-card deck afterwards.
         '''
         self.cards.clear()
         self.cards = [Card(rank, suit, self) for rank in Rank for suit in Suit] if init else []
+
+        if init:
+            match deck_count:
+                case 0:
+                    self.clear()
+                case 1:
+                    pass
+                case _:
+                    if isinstance(deck_count, int) and deck_count > 1:
+                        self.cards = [deepcopy(card) for card in self.cards for _ in range(deck_count)]
+                    else:
+                        raise TypeError("deck_count must be an integer")
 
         return self
 
@@ -147,6 +175,25 @@ class Deck:
             raise ValueError(f"Invalid cut index: {index}")
         self.cards = self.cards[index:] + self.cards[:index]
         return self
+
+    def deal(self, num_players: int, cards_per_player: int) -> list[list[Card]]:
+            """Deal cards to multiple players
+            
+            Args:
+                num_players: (int) Number of players to deal to
+                cards_per_player: (int) Number of cards each player should receive
+                
+            Returns:
+                List of card lists, where each inner list represents a player's hand
+            """
+            if num_players * cards_per_player > len(self):
+                raise ValueError(f"Not enough cards to deal {cards_per_player} cards to {num_players} players")
+            
+            hands = [[] for _ in range(num_players)]
+            for _ in range(cards_per_player):
+                for hand in hands:
+                    hand.append(self.draw())
+            return hands
 
     def draw(self) -> Card:
         '''
@@ -271,6 +318,37 @@ class Deck:
         self.extend(other.cards)
         return self
 
+    def __mul__(self, other: int) -> 'Deck':
+        """Allow deck * 3"""
+        if not isinstance(other, int):
+            return TypeError('Cannot multiply deck by non-integer')
+        if other < 0:
+            raise ValueError("Cannot multiply deck by negative number")
+        
+        result = Deck(self.cards)  # Create new deck with current cards
+        if other == 0:
+            result.clear()
+        elif other > 1:
+            result.cards = [deepcopy(card) for card in self.cards for _ in range(other)]
+        return result
+
+    def __rmul__(self, other: int) -> 'Deck':
+        """Allow 3 * deck"""
+        return self * other
+
+    def __imul__(self, other: int) -> 'Deck':
+        """Allow deck *= 3"""
+        if not isinstance(other, int):
+            TypeError("deck_count must be an integer")
+        if other < 0:
+            raise ValueError("Cannot multiply deck by negative number")
+        
+        if other == 0:
+            self.clear()
+        elif other > 1:
+            self.cards = [deepcopy(card) for card in self.cards for _ in range(other)]
+        return self
+
     def __repr__(self):
         return f'Deck({self.cards=})'
  
@@ -279,8 +357,4 @@ class Deck:
 
 
 if __name__ == '__main__':
-    card1 = Card(Rank.ACE, Suit.HEARTS)
-    card2 = Card(Rank.TEN, Suit.CLUBS)
-    card3 = Card(Rank.KING, Suit.SPADES)
-    deck = Deck([card1, card2, card3])
-    print(deck)
+    pass
