@@ -4,4 +4,4 @@
 A Python module for playing cards.
 '''
 
-from .cardpy import Rank, Suit, Card, Deck
+from .cardpy import Rank, Suit, Color, Card, Deck

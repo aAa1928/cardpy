@@ -31,11 +31,15 @@ class Rank(Enum):
     # JOKER = NotImplemented # TODO
 
 class Color(Enum):
+    '''
+    Color of playing cards. Red for hearts and diamonds, black for spades and clubs.
+    '''
     RED = 'red'
     BLACK = 'black'
 
 class Card:
-
+    
+    colors = [Color.RED, Color.BLACK]
     suits = [Suit.HEARTS, Suit.DIAMONDS, Suit.CLUBS, Suit.SPADES]
     ranks = [Rank.TWO, Rank.THREE, Rank.FOUR, Rank.FIVE, Rank.SIX, 
              Rank.SEVEN, Rank.EIGHT, Rank.NINE, Rank.TEN, Rank.JACK, 
