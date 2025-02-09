@@ -20,13 +20,19 @@ class Rank(Enum):
     QUEEN = 'Q'
     KING = 'K'
     ACE = 'A'
-    JOKER = NotImplemented # TODO
+    
+    # JOKER = NotImplemented # TODO
 
 class Color(Enum):
     RED = 'red'
     BLACK = 'black'
 
 class Card:
+    suits = [Suit.HEARTS, Suit.DIAMONDS, Suit.CLUBS, Suit.SPADES]
+    ranks = [Rank.TWO, Rank.THREE, Rank.FOUR, Rank.FIVE, Rank.SIX, 
+             Rank.SEVEN, Rank.EIGHT, Rank.NINE, Rank.TEN, Rank.JACK, 
+             Rank.QUEEN, Rank.KING, Rank.ACE]
+
     def __init__(self, _rank: Rank, _suit: Suit):
         self.rank = _rank
         self.suit = _suit
@@ -44,7 +50,18 @@ class Card:
     def __repr__(self):
         return f'Card({self.rank=}, {self.suit=})'
     
+    def __format__(self, format_spec):
+        match format_spec:
+            case 'rank':
+                return self.rank.value
+            case 'suit':
+                return self.suit.value
+            case 'color':
+                return self.color.value
+            case _:
+                raise ValueError(f'Invalid format specifier: {format_spec}')
+    
 if __name__ == '__main__':
     card1 = Card(Rank.ACE, Suit.SPADES)
     card2 = Card(Rank.ACE, Suit.SPADES)
-    print(card1 == card2)
+    print(f'{card1:rank}, {card1:suit}, {card1:color}')
