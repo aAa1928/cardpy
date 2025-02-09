@@ -199,9 +199,11 @@ class Deck:
         '''
         Draws card from top of the deck. Ensure deck is shuffled beforehand with shuffle() method.
         '''
-        card = self.cards.pop()
+        
+        if self.is_empty():
+            raise ValueError("Cannot draw from empty deck")
 
-        return card
+        return self.cards.pop()
 
     def draw_multiple(self, count: int) -> list[Card]:
         """Draw multiple cards from the deck"""
