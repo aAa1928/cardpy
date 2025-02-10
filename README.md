@@ -117,7 +117,9 @@ aces = deck.count(Card(Rank.ACE, Suit.SPADES))
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-[Code](https://github.com/aAa1928/cardpy)
+
+[GitHub](https://github.com/aAa1928/cardpy)
+[PyPi](https://pypi.org/project/cardpy/)
 
 ## License
 
