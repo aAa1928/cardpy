@@ -46,19 +46,22 @@ class Color(Enum):
 
 class Card:
     
-    colors = [Color.RED, Color.BLACK]
-    suits = [Suit.SPADES, Suit.HEARTS, Suit.DIAMONDS, Suit.CLUBS]
-    ranks = [Rank.TWO, Rank.THREE, Rank.FOUR, Rank.FIVE, Rank.SIX, 
+    FACE_CARDS = [Rank.JACK, Rank.QUEEN, Rank.KING]
+    COLORS = [Color.RED, Color.BLACK]
+    SUITS = [Suit.SPADES, Suit.HEARTS, Suit.DIAMONDS, Suit.CLUBS]
+    RANKS = [Rank.TWO, Rank.THREE, Rank.FOUR, Rank.FIVE, Rank.SIX, 
              Rank.SEVEN, Rank.EIGHT, Rank.NINE, Rank.TEN, Rank.JACK, 
              Rank.QUEEN, Rank.KING, Rank.ACE]
 
-    def __init__(self, _rank: Rank, _suit: Suit, *, _deck: Optional['Deck'] = None):
+    def __init__(self, _rank: Rank | str, _suit: Suit | str, *, _deck: Optional['Deck'] = None):
         """Initialize a new playing card.
         
         Args:
-            _rank: (Rank) The rank/value of the card (e.g., ACE, TWO, KING)
+            _rank: (Rank | str) The rank/value of the card (e.g., ACE, TWO, KING). Can also be represented \
+                with string representations (e.g., 'A', '2', 'K').
             _suit: (Suit) The suit of the card (HEARTS, DIAMONDS, SPADES, CLUBS)
-            _deck: (Optional[Deck]) The deck this card belongs to. Defaults to None.
+            _deck: (Optional[Deck]) The deck this card belongs to. Defaults to None. Can also be represented \
+                with string representations (e.g., '♥', '♦', '♠', '♣' or 'H', 'D', 'S', 'C').
             
         Note:
             The card's color is automatically determined based on the suit:
@@ -66,10 +69,27 @@ class Card:
             - BLACK for SPADES and CLUBS
         """
 
-        self.rank = _rank
-        self.suit = _suit
+        if isinstance(_rank, str):
+            self.rank = next((r for r in Rank if r.value == _rank), None)
+            if self.rank is None:
+                raise ValueError(f"Invalid rank: {_rank}")
+        elif isinstance(_rank, Rank):
+            self.rank = _rank
+        else:
+            raise TypeError(f"Invalid rank type: {type(_rank)}")
+
+        if isinstance(_suit, str):
+            self.suit = next((s for s in Suit if s.value == _suit or s.name[0] == _suit), None)
+            if self.suit is None:
+                raise ValueError(f"Invalid suit: {_suit}")
+        elif isinstance(_suit, Suit):
+            self.suit = _suit
+        else:
+            raise TypeError(f"Invalid suit type: {type(_suit)}")
+        
         self.color = Color.RED if self.suit in [Suit.HEARTS, Suit.DIAMONDS] else Color.BLACK if self.suit in \
             [Suit.SPADES, Suit.CLUBS] else None
+        
         self.deck = _deck
 
     def __eq__(self, other):
@@ -97,6 +117,8 @@ class Card:
 
 
 class Deck:
+
+    STANDARD_SIZE = 52
 
     def __init__(self, cards: Iterable[Card] = None, *, init: bool = False, deck_count: Optional[int] = 1):
         """Initialize a deck
