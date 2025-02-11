@@ -130,7 +130,7 @@ class Deck:
             deck_count: (int) Number of decks to create (duplicates cards). Defaults to 1. deck_count = 2 is \
                 is equivalent to creating a standard 52-card deck and adding another standard 52-card deck on top of it.
         """
-        self.cards = [Card(rank, suit, self) for rank in Rank for suit in Suit] if init else []
+        self.cards = [Card(rank, suit, _deck=self) for rank in Rank for suit in Suit] if init else []
         if not all (isinstance(card, (Card, Deck)) for card in cards):
             raise TypeError("Can only add Card or Deck objects to deck")
         
