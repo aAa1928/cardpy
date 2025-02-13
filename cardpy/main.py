@@ -131,8 +131,9 @@ class Deck:
                 is equivalent to creating a standard 52-card deck and adding another standard 52-card deck on top of it.
         """
         self.cards = [Card(rank, suit, _deck=self) for rank in Rank for suit in Suit] if init else []
-        if not all (isinstance(card, (Card, Deck)) for card in cards):
-            raise TypeError("Can only add Card or Deck objects to deck")
+        if cards:
+            if not all (isinstance(card, (Card, Deck)) for card in cards):
+                raise TypeError("Can only add Card or Deck objects to deck")
         
         if isinstance(cards, Deck):
             self.cards.extend(cards.cards)
@@ -260,11 +261,17 @@ class Deck:
         """Check if deck is empty"""
         return len(self) == 0
 
-    def peek(self, count: int = 1) -> list[Card]:
-        """Look at the top cards without removing them"""
+    def peek(self, from_top: bool = True) -> Card:
+        """Look at the top or bottom card without removing it"""
+        if self.is_empty():
+            raise ValueError("Cannot peek at a card in an empty deck")
+        return self.cards[-1] if from_top else self.cards[0]
+
+    def peek_multiple(self, count: int = 1, from_top: bool = True) -> list[Card]:
+        """Look at the top or bottom cards without removing them. Returns list of multiple cards"""
         if count > len(self):
             raise ValueError(f"Cannot peek at {count} cards in deck with {len(self)} cards")
-        return self.cards[-count:]
+        return self.cards[-count:] if from_top else self.cards[:count]
 
     def remove(self, card: Card) -> Self:
         """Remove first occurrence of a card"""
@@ -390,5 +397,14 @@ class Deck:
         return f'Deck of {len(self.cards)} cards: {[str(card) for card in self.cards]}'
 
 
-if __name__ == '__main__':
-    pass
+# class Hand(Deck):
+#     pass
+
+# Hand.play = Hand.draw
+
+# del Hand.draw
+
+# if __name__ == '__main__':
+#     # hand = Hand(init=True)
+
+#     # print(hand.peek())
