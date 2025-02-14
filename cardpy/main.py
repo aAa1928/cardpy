@@ -142,13 +142,10 @@ class Deck:
         """
         self.cards = [Card(rank, suit, _deck=self) for rank in Rank for suit in Suit] if init else []
         if cards:
-            if not all(isinstance(card, (Card, Deck)) for card in cards):
-                raise TypeError("Can only add Card or Deck objects to deck")
+            if not isinstance(cards, Iterable) or not all(isinstance(card, Card) for card in cards):
+                raise TypeError("Can only add an iterable of Card objects to deck")
         
-        if isinstance(cards, Deck):
-            self.cards.extend(cards.cards)
-        else:
-            self.cards.extend(cards) if cards else None
+        self.cards.extend(cards) if cards else None
 
         match deck_count:
             case 0:
@@ -162,7 +159,7 @@ class Deck:
                     raise TypeError("deck_count must be an integer greater than 1")
 
     def append(self, card: Card) -> Self:
-        """Add a card to the deck"""
+        f"""Add a card to the top of the {self.__class__.__name__.lower()}"""
         if not isinstance(card, Card):
             raise TypeError("Can only add Card objects to deck")
         self.cards.append(card)
@@ -170,8 +167,8 @@ class Deck:
         return self
 
     def clear(self, *, init = False, deck_count = 1) -> Self:
-        '''
-        Clears deck. If init is True, creates a standard 52-card deck afterwards.
+        f'''
+        Clears {self.__class__.__name__.lower()}. If init is True, creates a standard 52-card deck afterwards.
         '''
         self.cards.clear()
         self.cards = [Card(rank, suit, self) for rank in Rank for suit in Suit] if init else []
@@ -191,17 +188,17 @@ class Deck:
         return self
 
     def copy(self) -> 'Deck':
-        """Create a shallow copy of the deck"""
+        f"""Create a shallow copy of the {self.__class__.__name__.lower()}"""
         return Deck(self.cards.copy())
 
     def count(self, card: Card) -> int:
-        """Count occurrences of a card in the deck"""
+        f"""Count occurrences of a card in the {self.__class__.__name__.lower()}"""
         if not isinstance(card, Card):
             raise TypeError("Can only count Card objects")
         return self.cards.count(card)
 
     def cut(self, index: int = None) -> Self:
-        """Cut the deck at specified index or roughly in half"""
+        f"""Cut the {self.__class__.__name__.lower()} at specified index or roughly in half"""
         if index is None:
             index = len(self) // 2
         if not 0 <= index <= len(self):
@@ -229,8 +226,8 @@ class Deck:
             return hands
 
     def draw(self) -> Card:
-        '''
-        Draws card from top of the deck. Ensure deck is shuffled beforehand with shuffle() method.
+        f'''
+        Draws card from top of the {self.__class__.__name__.lower()}. Ensure deck is shuffled beforehand with shuffle() method.
         '''
         
         if self.is_empty():
@@ -239,7 +236,7 @@ class Deck:
         return self.cards.pop()
 
     def draw_multiple(self, count: int) -> list[Card]:
-        """Draw multiple cards from the deck"""
+        f"""Draw multiple cards from the deck"""
         if count > len(self):
             raise ValueError(f"Cannot draw {count} cards from deck with {len(self)} cards")
         return [self.draw() for _ in range(count)]
@@ -401,7 +398,7 @@ class Hand:
 
 
     def __init__(self, cards: Iterable[Card] = None):
-        """Initialize a hand
+        f"""Initialize a {self.__class__.__name__.lower()}
         
         Args:
             cards: (Card) Additional cards in an iterable, such as a list, to initialize the deck with. \
@@ -409,56 +406,29 @@ class Hand:
         """
         self.cards = []
         if cards:
-            if not all(isinstance(card, (Card, Deck)) for card in cards):
-                raise TypeError("Can only add Card or Deck objects to deck")
+            if not isinstance(cards, Iterable) or not all(isinstance(card, Card) for card in cards):
+                raise TypeError("Can only add an iterable of Card objects to deck")
         
-        if isinstance(cards, Deck):
-            self.cards.extend(cards.cards)
-        else:
-            self.cards.extend(cards) if cards else None
-
-        match deck_count:
-            case 0:
-                self.clear()
-            case 1:
-                pass
-            case _:
-                if isinstance(deck_count, int) and deck_count > 1:
-                    self.cards = [deepcopy(card) for card in self.cards for _ in range(deck_count)]
-                else:
-                    raise TypeError("deck_count must be an integer greater than 1")
+        self.cards.extend(cards) if cards else None
 
     def append(self, card: Card) -> Self:
-        """Add a card to the deck"""
+        f"""Add a card to the top of the {self.__class__.__name__.lower()}"""
         if not isinstance(card, Card):
             raise TypeError("Can only add Card objects to deck")
         self.cards.append(card)
 
         return self
 
-    def clear(self, *, init = False, deck_count = 1) -> Self:
-        '''
-        Clears deck. If init is True, creates a standard 52-card deck afterwards.
+    def clear(self) -> Self:
+        f'''
+        Clears {self.__class__.__name__.lower()}. If init is True, creates a standard 52-card deck afterwards.
         '''
         self.cards.clear()
-        self.cards = [Card(rank, suit, self) for rank in Rank for suit in Suit] if init else []
-
-        if init:
-            match deck_count:
-                case 0:
-                    self.clear()
-                case 1:
-                    pass
-                case _:
-                    if isinstance(deck_count, int) and deck_count > 1:
-                        self.cards = [deepcopy(card) for card in self.cards for _ in range(deck_count)]
-                    else:
-                        raise TypeError("deck_count must be an integer")
 
         return self
 
     def copy(self) -> 'Deck':
-        """Create a shallow copy of the deck"""
+        f"""Create a shallow copy of the {self.__class__.__name__.lower()}"""
         return Deck(self.cards.copy())
 
     def count(self, card: Card) -> int:
