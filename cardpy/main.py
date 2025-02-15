@@ -118,8 +118,12 @@ class Card:
             self.value = next((s for s in Suit if s.value == value or s.name[0] == value), None)
             if self.value is None:
                 raise ValueError(f"Invalid suit: {value}")
+            self.color = Color.RED if self.value in Card.SUITS_RED else Color.BLACK if self.value in \
+                Card.SUITS_BLACK else None
         elif isinstance(value, Suit):
             self.value = value
+            self.color = Color.RED if self.value in Card.SUITS_RED else Color.BLACK if self.value in \
+                Card.SUITS_BLACK else None
         else:
             raise TypeError(f"Invalid suit type: {type(value)}")
 
@@ -137,9 +141,9 @@ class Card:
     
     @face_up.setter
     def face_up(self, value: bool):
-        if not isinstance(value, bool):
+        if not isinstance(value, (bool, int)):
             raise TypeError(f"Invalid face_up type: {type(value)}")
-        self._face_up = value
+        self._face_up = bool(value)
 
     def flip(self):
         """Flip card face up/down"""
