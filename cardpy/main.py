@@ -56,7 +56,7 @@ class Card:
     FACE_CARDS = [Rank.JACK, Rank.QUEEN, Rank.KING]
 
     def __init__(self, _rank: Rank | str, _suit: Suit | str, /, _face_up: bool = False, *, \
-                 _deck: Optional['Deck'] = None):
+                 _deck: Optional['Deck'] = None, _hand: Optional['Hand'] = None):
         """Initialize a new playing card.
         
         Args:
@@ -97,6 +97,7 @@ class Card:
         self._face_up = bool(_face_up)
 
         self.deck = _deck
+        self.hand = _hand # TODO: Add getters and setters
 
     @property
     def rank(self) -> Rank:
@@ -115,14 +116,15 @@ class Card:
     @suit.setter
     def suit(self, value: Suit):
         if isinstance(value, str):
-            self.value = next((s for s in Suit if s.value == value or s.name[0] == value), None)
-            if self.value is None:
+            value = next((s for s in Suit if s.value == value or s.name[0] == value), None)
+            if value is None:
                 raise ValueError(f"Invalid suit: {value}")
-            self.color = Color.RED if self.value in Card.SUITS_RED else Color.BLACK if self.value in \
+            self._suit = value
+            self._color = Color.RED if value in Card.SUITS_RED else Color.BLACK if value in \
                 Card.SUITS_BLACK else None
         elif isinstance(value, Suit):
-            self.value = value
-            self.color = Color.RED if self.value in Card.SUITS_RED else Color.BLACK if self.value in \
+            self._suit = value
+            self._color = Color.RED if value in Card.SUITS_RED else Color.BLACK if value in \
                 Card.SUITS_BLACK else None
         else:
             raise TypeError(f"Invalid suit type: {type(value)}")
@@ -166,10 +168,22 @@ class Card:
         return Card.ranks.index(self.rank) > Card.ranks.index(other.rank)
 
     def __str__(self):
-        return f'{self.rank.name} of {self.suit.name} {self.suit.value}'
+        if self.face_up:
+            return f'{self.rank.name} of {self.suit.name} {self.suit.value}'
+        else:
+            return 'Card'
 
     def __repr__(self):
-        return f'Card({self.rank=}, {self.suit=})'
+        if not self.face_up:
+            return f'Card({self.face_up=})'
+        elif self.deck and self.hand:
+            return f'Card({self.rank}, {self.suit}, {self.face_up=}, {self.deck=}, {self.hand=})'
+        elif self.deck:
+            return f'Card({self.rank}, {self.suit}, {self.face_up=}, {self.deck=})'
+        elif self.hand:
+            return f'Card({self.rank}, {self.suit}, {self.face_up=}, {self.hand=})'
+        else:
+            return f'Card({self.rank}, {self.suit}, {self.face_up=})'
     
     def __format__(self, format_spec):
         match format_spec:
@@ -705,6 +719,7 @@ class Hand:
 
 
 if __name__ == '__main__':
-    hand = Hand([Card(Rank.TWO, Suit.SPADES), Card(Rank.ACE, Suit.HEARTS)])
-    hand2 = Hand([Card(Rank.TWO, Suit.SPADES)])
-    print(hand + hand2)
+    card = Card(Rank.ACE, Suit.SPADES)
+    card2 = Card(Rank.TEN, Suit.DIAMONDS, True)
+
+    print(repr(card), card2, sep='\n')
