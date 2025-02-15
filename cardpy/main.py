@@ -98,6 +98,49 @@ class Card:
 
         self.deck = _deck
 
+    @property
+    def rank(self) -> Rank:
+        return self._rank
+    
+    @rank.setter
+    def rank(self, value: Rank):
+        if not isinstance(value, Rank):
+            raise TypeError(f"Invalid rank type: {type(value)}")
+        self._rank = value
+
+    @property
+    def suit(self) -> Suit:
+        return self._suit
+    
+    @suit.setter
+    def suit(self, value: Suit):
+        if isinstance(value, str):
+            self.value = next((s for s in Suit if s.value == value or s.name[0] == value), None)
+            if self.value is None:
+                raise ValueError(f"Invalid suit: {value}")
+        elif isinstance(value, Suit):
+            self.value = value
+        else:
+            raise TypeError(f"Invalid suit type: {type(value)}")
+
+    @property
+    def color(self) -> Color:
+        return self._color
+    
+    @color.setter
+    def color(self, value: Color):
+        raise AttributeError("Color cannot be modified - it is determined by suit")
+
+    @property
+    def face_up(self) -> bool:
+        return self._face_up
+    
+    @face_up.setter
+    def face_up(self, value: bool):
+        if not isinstance(value, bool):
+            raise TypeError(f"Invalid face_up type: {type(value)}")
+        self._face_up = value
+
     def flip(self):
         """Flip card face up/down"""
         self.face_up = not self.face_up
