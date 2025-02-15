@@ -46,20 +46,24 @@ class Color(Enum):
 
 class Card:
     
-    FACE_CARDS = [Rank.JACK, Rank.QUEEN, Rank.KING]
     COLORS = [Color.RED, Color.BLACK]
     SUITS = [Suit.SPADES, Suit.HEARTS, Suit.DIAMONDS, Suit.CLUBS]
+    SUITS_RED = [Suit.HEARTS, Suit.DIAMONDS]
+    SUITS_BLACK = [Suit.SPADES, Suit.CLUBS] 
     RANKS = [Rank.TWO, Rank.THREE, Rank.FOUR, Rank.FIVE, Rank.SIX, 
              Rank.SEVEN, Rank.EIGHT, Rank.NINE, Rank.TEN, Rank.JACK, 
              Rank.QUEEN, Rank.KING, Rank.ACE]
+    FACE_CARDS = [Rank.JACK, Rank.QUEEN, Rank.KING]
 
-    def __init__(self, _rank: Rank | str, _suit: Suit | str, *, _deck: Optional['Deck'] = None):
+    def __init__(self, _rank: Rank | str, _suit: Suit | str, /, _face_up: bool = False, *, \
+                 _deck: Optional['Deck'] = None):
         """Initialize a new playing card.
         
         Args:
             _rank: (Rank | str) The rank/value of the card (e.g., ACE, TWO, KING). Can also be represented \
                 with string representations (e.g., 'A', '2', 'K').
             _suit: (Suit) The suit of the card (HEARTS, DIAMONDS, SPADES, CLUBS)
+            _face_up: (bool): Determines whether card is face up or down.
             _deck: (Optional[Deck]) The deck this card belongs to. Defaults to None. Can also be represented \
                 with string representations (e.g., '♥', '♦', '♠', '♣' or 'H', 'D', 'S', 'C').
             
@@ -70,27 +74,33 @@ class Card:
         """
 
         if isinstance(_rank, str):
-            self.rank = next((r for r in Rank if r.value == _rank), None)
-            if self.rank is None:
+            self._rank = next((r for r in Rank if r.value == _rank), None)
+            if self._rank is None:
                 raise ValueError(f"Invalid rank: {_rank}")
         elif isinstance(_rank, Rank):
-            self.rank = _rank
+            self._rank = _rank
         else:
             raise TypeError(f"Invalid rank type: {type(_rank)}")
 
         if isinstance(_suit, str):
-            self.suit = next((s for s in Suit if s.value == _suit or s.name[0] == _suit), None)
-            if self.suit is None:
+            self._suit = next((s for s in Suit if s.value == _suit or s.name[0] == _suit), None)
+            if self._suit is None:
                 raise ValueError(f"Invalid suit: {_suit}")
         elif isinstance(_suit, Suit):
-            self.suit = _suit
+            self._suit = _suit
         else:
             raise TypeError(f"Invalid suit type: {type(_suit)}")
         
-        self.color = Color.RED if self.suit in [Suit.HEARTS, Suit.DIAMONDS] else Color.BLACK if self.suit in \
-            [Suit.SPADES, Suit.CLUBS] else None
+        self._color = Color.RED if self.suit in Card.SUITS_RED else Color.BLACK if self.suit in \
+            Card.SUITS_BLACK else None
         
+        self._face_up = bool(_face_up)
+
         self.deck = _deck
+
+    def flip(self):
+        """Flip card face up/down"""
+        self.face_up = not self.face_up
 
     def __eq__(self, other):
         if not isinstance(other, Card):
