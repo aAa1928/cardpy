@@ -3,6 +3,8 @@ from enum import Enum
 from random import shuffle
 from typing import Iterable, Iterator, Optional, Self
 
+from colorama import Fore, Style
+
 class Rank(Enum):
     """
     Ranks of playing cards in ascending order from TWO to ACE.
@@ -147,9 +149,11 @@ class Card:
             raise TypeError(f"Invalid face_up type: {type(value)}")
         self._face_up = bool(value)
 
-    def flip(self):
+    def flip(self) -> Self:
         """Flip card face up/down"""
         self.face_up = not self.face_up
+
+        return self
 
     def __eq__(self, other):
         if not isinstance(other, Card):
@@ -168,10 +172,8 @@ class Card:
         return Card.ranks.index(self.rank) > Card.ranks.index(other.rank)
 
     def __str__(self):
-        if self.face_up:
-            return f'{self.rank.name} of {self.suit.name} {self.suit.value}'
-        else:
-            return 'Card'
+        return f"{Fore.BLACK}{self.rank.value}{self.suit.value}{Style.RESET_ALL}" \
+                if self.face_up else f"{Style.DIM}Card{Style.RESET_ALL}"
 
     def __repr__(self):
         if not self.face_up:
@@ -720,6 +722,6 @@ class Hand:
 
 if __name__ == '__main__':
     card = Card(Rank.ACE, Suit.SPADES)
-    card2 = Card(Rank.TEN, Suit.DIAMONDS, True)
+    card2 = Card(Rank.TEN, Suit.DIAMONDS, False)
 
     print(repr(card), card2, sep='\n')
