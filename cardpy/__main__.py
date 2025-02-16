@@ -1,4 +1,4 @@
-'''
+print('''
 # cardpy
 
 A comprehensive Python module for playing cards, providing flexible card and deck management with type hints and modern Python features.
@@ -155,6 +155,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 Risheet Lenka - [GitHub Profile](https://github.com/aAa1928)
 
-'''
-
-from .main import Rank, Suit, Color, Card, Deck, Hand
+''')
